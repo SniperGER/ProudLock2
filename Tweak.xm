@@ -57,12 +57,43 @@ CFPropertyListRef new_MGCopyAnswer_internal(CFStringRef key, uint32_t* outTypeCo
 
 
 
+#define CGRectSetY(rect, y) CGRectMake(rect.origin.x, y, rect.size.width, rect.size.height)
+static CGFloat offset = 0;
+
+%hook SBDashBoardViewController
+- (void)loadView {
+	CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
+	if (screenWidth <= 320) {
+		offset = 20;
+	} else if (screenWidth <= 375) {
+		offset = 35;
+	} else if (screenWidth <= 414) {
+		offset = 28;
+	}
+	
+	%orig;
+}
+%end    // %hook SBDashBoardViewController
+
 %hook SBUICAPackageView
 - (id)initWithPackageName:(id)arg1 inBundle:(id)arg2 {
-	NSLog(@"[ProudLock2] -[SBUICAPackageView initWithPackageName:inBundle] = %@, %@", arg1, arg2);
 	return %orig(arg1, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
 }
 %end	// %hook SBUICAPackageView
+
+%hook SBFLockScreenDateView
+- (void)layoutSubviews {
+	%orig;
+
+	UIView* timeView = MSHookIvar<UIView*>(self, "_timeLabel");
+	UIView* dateSubtitleView = MSHookIvar<UIView*>(self, "_dateSubtitleView");
+	UIView* customSubtitleView = MSHookIvar<UIView*>(self, "_customSubtitleView");
+	
+	[timeView setFrame:CGRectSetY(timeView.frame, timeView.frame.origin.y + offset)];
+	[dateSubtitleView setFrame:CGRectSetY(dateSubtitleView.frame, dateSubtitleView.frame.origin.y + offset)];
+	[customSubtitleView setFrame:CGRectSetY(customSubtitleView.frame, customSubtitleView.frame.origin.y + offset)];
+}
+%end	// %hook SBFLockScreenDateView
 
 
 
