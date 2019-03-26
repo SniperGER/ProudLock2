@@ -1,0 +1,9 @@
+Package: ml.festival.proudlockxr
+Name: ProudLock X🅁
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: Sniper_GER <sniperger@festival.ml>
+Author: Sniper_GER <sniperger@festival.ml>
+Section: Tweaks
