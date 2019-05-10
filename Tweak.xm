@@ -6,9 +6,6 @@
 // All Rights reserved
 //
 
-#import <substrate.h>
-#import <stdint.h>
-
 // This code is taken from tonyk7's MGSpoof, which is a modified patchfinder64 from xerub
 // I use this only to prevent hardcoding the address of MGCopyAnswer_internal
 
