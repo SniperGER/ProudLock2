@@ -46,8 +46,6 @@ CFPropertyListRef new_MGCopyAnswer_internal(CFStringRef key, uint32_t* outTypeCo
 	CFPropertyListRef r = orig_MGCopyAnswer_internal(key, outTypeCode);
 #define k(string) CFEqual(key, CFSTR(string))
 	
-	// Apparently, only the 'IsEmulatedDevice' key is needed to add the Face ID latch to the lockscreen
-	// However, it doesn't fully work as expected, but this is a challenge for someone else
 	if (k("z5G/N9jcMdgPm8UegLwbKg") || k("IsEmulatedDevice")) {
 		return (__bridge CFPropertyListRef)@YES;
 	}
@@ -62,6 +60,11 @@ static CGFloat offset = 0;
 
 %hook SBDashBoardViewController
 - (void)loadView {
+	if (%c(JPWeatherManager) != nil) {
+		%orig;
+		return;
+	}
+	
 	CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
 	if (screenWidth <= 320) {
 		offset = 20;
@@ -84,6 +87,10 @@ static CGFloat offset = 0;
 %hook SBFLockScreenDateView
 - (void)layoutSubviews {
 	%orig;
+	
+	if (%c(JPWeatherManager) != nil) {
+		return;
+	}
 
 	UIView* timeView = MSHookIvar<UIView*>(self, "_timeLabel");
 	UIView* dateSubtitleView = MSHookIvar<UIView*>(self, "_dateSubtitleView");
@@ -94,6 +101,40 @@ static CGFloat offset = 0;
 	[customSubtitleView setFrame:CGRectSetY(customSubtitleView.frame, customSubtitleView.frame.origin.y + offset)];
 }
 %end	// %hook SBFLockScreenDateView
+
+%hook SBUIBiometricResource
+- (id)init {
+	id r = %orig;
+	
+	MSHookIvar<BOOL>(r, "_hasMesaHardware") = NO;
+	MSHookIvar<BOOL>(r, "_hasPearlHardware") = YES;
+	
+	return r;
+}
+%end	// %hook SBUIBiometricResource
+
+
+@interface PKGlyphView : UIView
+@end
+
+%hook PKGlyphView
+- (void)setHidden:(BOOL)arg1 {
+	if ([self.superview isKindOfClass:%c(SBUIPasscodeBiometricAuthenticationView)]) {
+		%orig(NO);
+		return;
+	}
+	
+	%orig;
+}
+
+- (BOOL)hidden {
+	if ([self.superview isKindOfClass:%c(SBUIPasscodeBiometricAuthenticationView)]) {
+		return NO;
+	}
+	
+	return %orig;
+}
+%end	// %hook PKGlyphView
 
 
 
