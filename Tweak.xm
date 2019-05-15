@@ -141,7 +141,7 @@ static CGFloat offset = 0;
 		frame = CGRectMake(frame.origin.x,frame.origin.y + 25,frame.size.width,frame.size.height);
 		%orig(frame);
 }
-%end
+%end 	// %hook NCNotificationListCollectionView
 
 %hook SBDashBoardAdjunctListView
 - (void)setFrame:(CGRect)frame {
