@@ -150,7 +150,7 @@ static CGFloat offset = 0;
 }
 
 
-%end
+%end	// %hook SBDashBoardAdjunctListView
 
 %ctor {
 	MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
