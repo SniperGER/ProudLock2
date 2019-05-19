@@ -3,7 +3,7 @@ export THEOS_DEVICE_PORT=22
 export SDKROOT=iphoneos
 export SYSROOT=$(THEOS)/sdks/iPhoneOS11.2.sdk
 
-export PACKAGE_VERSION=0.2
+export PACKAGE_VERSION=0.3
 export ARCHS = arm64
 TARGET=iphone:latest:11.0
 
