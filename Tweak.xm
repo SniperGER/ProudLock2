@@ -6,8 +6,7 @@
 // All Rights reserved
 //
 
-#import <substrate.h>
-#import <stdint.h>
+#import "Tweak.h"
 
 // This code is taken from tonyk7's MGSpoof, which is a modified patchfinder64 from xerub
 // I use this only to prevent hardcoding the address of MGCopyAnswer_internal
@@ -55,7 +54,6 @@ CFPropertyListRef new_MGCopyAnswer_internal(CFStringRef key, uint32_t* outTypeCo
 
 
 
-#define CGRectSetY(rect, y) CGRectMake(rect.origin.x, y, rect.size.width, rect.size.height)
 static CGFloat offset = 0;
 
 %hook SBDashBoardViewController
@@ -112,10 +110,6 @@ static CGFloat offset = 0;
 	return r;
 }
 %end	// %hook SBUIBiometricResource
-
-
-@interface PKGlyphView : UIView
-@end
 
 %hook PKGlyphView
 - (void)setHidden:(BOOL)arg1 {
