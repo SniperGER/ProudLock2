@@ -74,6 +74,19 @@ static CGFloat offset = 0;
 	
 	%orig;
 }
+
+- (void)handleBiometricEvent:(unsigned long long)arg1 {
+	%orig;
+
+	if (arg1 == kBiometricEventMesaSuccess) {
+		SBDashBoardMesaUnlockBehaviorConfiguration* unlockBehavior = MSHookIvar<SBDashBoardMesaUnlockBehaviorConfiguration*>(self, "_mesaUnlockBehaviorConfiguration");
+		if ([unlockBehavior _isAccessibilityRestingUnlockPreferenceEnabled]) {
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[[%c(SBLockScreenManager) sharedInstance] _finishUIUnlockFromSource:12 withOptions:nil];
+			});
+		}
+	}
+}
 %end    // %hook SBDashBoardViewController
 
 %hook SBUICAPackageView
