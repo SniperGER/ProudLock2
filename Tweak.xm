@@ -136,7 +136,21 @@ static CGFloat offset = 0;
 }
 %end	// %hook PKGlyphView
 
+%hook NCNotificationListCollectionView
+- (void)setFrame:(CGRect)frame {
+		frame = CGRectMake(frame.origin.x,frame.origin.y + 25,frame.size.width,frame.size.height);
+		%orig(frame);
+}
+%end 	// %hook NCNotificationListCollectionView
 
+%hook SBDashBoardAdjunctListView
+- (void)setFrame:(CGRect)frame {
+		frame = CGRectMake(0,frame.origin.y + 25,frame.size.width,frame.size.height);
+		%orig(frame);
+}
+
+
+%end	// %hook SBDashBoardAdjunctListView
 
 %ctor {
 	MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
