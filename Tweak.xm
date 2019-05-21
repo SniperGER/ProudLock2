@@ -68,7 +68,7 @@ static CGFloat offset = 0;
 		offset = 20;
 	} else if (screenWidth <= 375) {
 		offset = 35;
-	} else if (screenWidth <= 414) {
+	} else {
 		offset = 28;
 	}
 	
