@@ -89,6 +89,17 @@ static CGFloat offset = 0;
 }
 %end    // %hook SBDashBoardViewController
 
+%hook SBUIProudLockIconView
+- (void)setFrame:(CGRect)frame {
+	if (!%c(NotchWindow)) {
+		%orig;
+		return;
+	}
+
+	%orig(CGRectSetY(frame, frame.origin.y + offset));
+}
+%end
+
 %hook SBUICAPackageView
 - (id)initWithPackageName:(id)arg1 inBundle:(id)arg2 {
 	return %orig(arg1, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
