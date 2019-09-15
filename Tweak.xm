@@ -107,20 +107,12 @@ static CGFloat offset = 0;
 %end	// %hook SBUICAPackageView
 
 %hook SBFLockScreenDateView
-- (void)layoutSubviews {
-	%orig;
-	
+- (void)setFrame:(CGRect)frame {	
 	if (%c(JPWeatherManager) != nil) {
 		return;
 	}
 
-	UIView* timeView = MSHookIvar<UIView*>(self, "_timeLabel");
-	UIView* dateSubtitleView = MSHookIvar<UIView*>(self, "_dateSubtitleView");
-	UIView* customSubtitleView = MSHookIvar<UIView*>(self, "_customSubtitleView");
-	
-	[timeView setFrame:CGRectSetY(timeView.frame, timeView.frame.origin.y + offset)];
-	[dateSubtitleView setFrame:CGRectSetY(dateSubtitleView.frame, dateSubtitleView.frame.origin.y + offset)];
-	[customSubtitleView setFrame:CGRectSetY(customSubtitleView.frame, customSubtitleView.frame.origin.y + offset)];
+  	%orig(CGRectSetY(frame, frame.origin.y + offset));
 }
 %end	// %hook SBFLockScreenDateView
 
