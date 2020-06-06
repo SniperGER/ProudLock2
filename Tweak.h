@@ -22,6 +22,9 @@
 - (BOOL)_isAccessibilityRestingUnlockPreferenceEnabled;
 @end
 
+@interface SBDashBoardBiometricUnlockController : NSObject
+@end
+
 @interface SBLockScreenController : NSObject {
 	SBDashBoardMesaUnlockBehaviorConfiguration *_mesaUnlockBehaviorConfiguration;
 }

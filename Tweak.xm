@@ -80,6 +80,7 @@ static CGFloat offset = 0;
 
 	if (arg1 == kBiometricEventMesaSuccess) {
 		SBDashBoardMesaUnlockBehaviorConfiguration* unlockBehavior = MSHookIvar<SBDashBoardMesaUnlockBehaviorConfiguration*>(self, "_mesaUnlockBehaviorConfiguration");
+		
 		if ([unlockBehavior _isAccessibilityRestingUnlockPreferenceEnabled]) {
 			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
 				[[%c(SBLockScreenManager) sharedInstance] _finishUIUnlockFromSource:12 withOptions:nil];
@@ -88,6 +89,23 @@ static CGFloat offset = 0;
 	}
 }
 %end    // %hook SBDashBoardViewController
+
+%hook SBDashBoardLockScreenEnvironment
+- (void)handleBiometricEvent:(unsigned long long)arg1 {
+	%orig;
+
+	if (arg1 == kBiometricEventMesaSuccess) {
+		SBDashBoardBiometricUnlockController* biometricUnlockController = MSHookIvar<SBDashBoardBiometricUnlockController*>(self, "_biometricUnlockController");
+		SBDashBoardMesaUnlockBehaviorConfiguration* unlockBehavior = MSHookIvar<SBDashBoardMesaUnlockBehaviorConfiguration*>(biometricUnlockController, "_biometricUnlockBehaviorConfiguration");
+		
+		if ([unlockBehavior _isAccessibilityRestingUnlockPreferenceEnabled]) {
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[[%c(SBLockScreenManager) sharedInstance] _finishUIUnlockFromSource:12 withOptions:nil];
+			});
+		}
+	}
+}
+%end
 
 %hook SBUIProudLockIconView
 - (void)setFrame:(CGRect)frame {
