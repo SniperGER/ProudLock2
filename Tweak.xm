@@ -90,23 +90,6 @@ static CGFloat offset = 0;
 }
 %end    // %hook SBDashBoardViewController
 
-%hook SBDashBoardLockScreenEnvironment
-- (void)handleBiometricEvent:(unsigned long long)arg1 {
-	%orig;
-
-	if (arg1 == kBiometricEventMesaSuccess) {
-		SBDashBoardBiometricUnlockController* biometricUnlockController = MSHookIvar<SBDashBoardBiometricUnlockController*>(self, "_biometricUnlockController");
-		SBDashBoardMesaUnlockBehaviorConfiguration* unlockBehavior = MSHookIvar<SBDashBoardMesaUnlockBehaviorConfiguration*>(biometricUnlockController, "_biometricUnlockBehaviorConfiguration");
-		
-		if ([unlockBehavior _isAccessibilityRestingUnlockPreferenceEnabled]) {
-			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-				[[%c(SBLockScreenManager) sharedInstance] _finishUIUnlockFromSource:12 withOptions:nil];
-			});
-		}
-	}
-}
-%end
-
 %hook SBUIProudLockIconView
 - (void)setFrame:(CGRect)frame {
 	if (!%c(NotchWindow)) {
@@ -185,6 +168,46 @@ static CGFloat offset = 0;
 %end	// %hook SBDashBoardAdjunctListView
 
 
+%group iOS13
+%hook SBDashBoardLockScreenEnvironment
+- (void)handleBiometricEvent:(unsigned long long)arg1 {
+	%orig;
+
+	if (arg1 == kBiometricEventMesaSuccess) {
+		SBDashBoardBiometricUnlockController* biometricUnlockController = MSHookIvar<SBDashBoardBiometricUnlockController*>(self, "_biometricUnlockController");
+		SBDashBoardMesaUnlockBehaviorConfiguration* unlockBehavior = MSHookIvar<SBDashBoardMesaUnlockBehaviorConfiguration*>(biometricUnlockController, "_biometricUnlockBehaviorConfiguration");
+		
+		if ([unlockBehavior _isAccessibilityRestingUnlockPreferenceEnabled]) {
+			dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+				[[%c(SBLockScreenManager) sharedInstance] _finishUIUnlockFromSource:12 withOptions:nil];
+			});
+		}
+	}
+}
+%end	/// %hook SBDashBoardLockScreenEnvironment
+
+%hook BSUICAPackageView
+- (id)initWithPackageName:(id)arg1 inBundle:(id)arg2 {
+	NSString* packageName = nil;
+	
+	if ([arg1 hasPrefix:@"lock@2x-120fps~ipad"]) {
+		packageName = @"lock@2x-j3xx";
+	} else if ([arg1 hasPrefix:@"lock@2x-812h"]) {
+		packageName = @"lock@2x-812h-n84";
+	} else if ([arg1 hasPrefix:@"lock@2x-896h"]) {
+		packageName = @"lock@2x-896h-n84";
+	} else if ([arg1 hasPrefix:@"lock@3x-812h"]) {
+		packageName = arg1;
+	} else if ([arg1 hasPrefix:@"lock@3x-896h"]) {
+		packageName = @"lock@3x-896h-d33";
+	}
+	
+	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
+}
+%end	// %hook BSUICAPackageView
+%end	// %group iOS13
+
+
 
 %ctor {
 	MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
@@ -196,5 +219,9 @@ static CGFloat offset = 0;
 		MSHookFunction(((void *)((const uint8_t *)MGCopyAnswerFn + branch_offset)), (void *)new_MGCopyAnswer_internal, (void **)&orig_MGCopyAnswer_internal);
 		
 		%init();
+		
+		if (kCFCoreFoundationVersionNumber >= 1665.15) {
+			%init(iOS13);
+		}
 	}
 }
