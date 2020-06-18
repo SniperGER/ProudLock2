@@ -188,6 +188,8 @@ static CGFloat offset = 0;
 
 %hook BSUICAPackageView
 - (id)initWithPackageName:(id)arg1 inBundle:(id)arg2 {
+	if (![arg1 hasPrefix:@"lock"]) return %orig;
+	
 	NSString* packageName = nil;
 	
 	if ([arg1 hasPrefix:@"lock@2x-120fps~ipad"]) {
@@ -201,9 +203,9 @@ static CGFloat offset = 0;
 	} else if ([arg1 hasPrefix:@"lock@3x-896h"]) {
 		packageName = @"lock@3x-896h-d33";
 	} else {
-		return %orig;
+		packageName = @"lock@2x-812h-n84";
 	}
-	
+
 	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
 }
 %end	// %hook BSUICAPackageView
