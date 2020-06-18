@@ -200,6 +200,8 @@ static CGFloat offset = 0;
 		packageName = arg1;
 	} else if ([arg1 hasPrefix:@"lock@3x-896h"]) {
 		packageName = @"lock@3x-896h-d33";
+	} else {
+		return %orig;
 	}
 	
 	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);

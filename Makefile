@@ -1,6 +1,6 @@
 export THEOS_DEVICE_IP=Janiks-iPad-Pro.local
 
-export PACKAGE_VERSION=0.3-1
+export PACKAGE_VERSION=0.3-2
 export ARCHS = arm64 arm64e
 TARGET=iphone:13.3:latest
 
