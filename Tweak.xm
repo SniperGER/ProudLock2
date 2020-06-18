@@ -57,24 +57,6 @@ CFPropertyListRef new_MGCopyAnswer_internal(CFStringRef key, uint32_t* outTypeCo
 static CGFloat offset = 0;
 
 %hook SBDashBoardViewController
-- (void)loadView {
-	if (%c(JPWeatherManager) != nil) {
-		%orig;
-		return;
-	}
-	
-	CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
-	if (screenWidth <= 320) {
-		offset = 20;
-	} else if (screenWidth <= 375) {
-		offset = 35;
-	} else if (screenWidth <= 414) {
-		offset = 28;
-	}
-	
-	%orig;
-}
-
 - (void)handleBiometricEvent:(unsigned long long)arg1 {
 	%orig;
 
@@ -108,6 +90,25 @@ static CGFloat offset = 0;
 %end	// %hook SBUICAPackageView
 
 %hook SBFLockScreenDateView
+-(id)initWithFrame:(CGRect)arg1 {
+
+    if (%c(JPWeatherManager) != nil) {
+		%orig;
+		return;
+    }
+    
+    CGFloat const screenWidth = UIScreen.mainScreen.bounds.size.width;
+	if (screenWidth <= 320) {
+		offset = 20;
+	} else if (screenWidth <= 375) {
+		offset = 35;
+	} else if (screenWidth <= 414) {
+		offset = 28;
+	}
+
+    return %orig;
+
+}
 - (void)layoutSubviews {
 	%orig;
 	
