@@ -1,7 +1,7 @@
 export THEOS_DEVICE_IP=Janiks-iPad-Pro.local
 export THEOS_DEVICE_PORT=22
 export SDKROOT=iphoneos
-export SYSROOT=$(THEOS)/sdks/iPhoneOS11.2.sdk
+export SYSROOT=$(THEOS)/sdks/iPhoneOS13.3.sdk
 
 export PACKAGE_VERSION=0.3-1
 export ARCHS = arm64 arm64e
