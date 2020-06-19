@@ -213,7 +213,7 @@ static CGFloat offset = 0;
 
 %hook CSCombinedListViewController
 - (UIEdgeInsets)_listViewDefaultContentInsets {
-    UIEdgeInsets const orig = %orig;
+    UIEdgeInsets orig = %orig;
 
     orig.top += offset;
     return orig;
