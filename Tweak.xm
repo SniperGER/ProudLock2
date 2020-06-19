@@ -210,6 +210,15 @@ static CGFloat offset = 0;
 	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
 }
 %end	// %hook BSUICAPackageView
+
+%hook CSCombinedListViewController
+- (UIEdgeInsets)_listViewDefaultContentInsets {
+    UIEdgeInsets const orig = %orig;
+
+    orig.top += offset;
+    return orig;
+}
+%end	// %hook CSCombinedListViewController
 %end	// %group iOS13
 
 
