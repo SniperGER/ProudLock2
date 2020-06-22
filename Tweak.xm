@@ -90,11 +90,10 @@ static CGFloat offset = 0;
 %end	// %hook SBUICAPackageView
 
 %hook SBFLockScreenDateView
--(id)initWithFrame:(CGRect)arg1 {
+- (id)initWithFrame:(CGRect)arg1 {
 
     if (%c(JPWeatherManager) != nil) {
-		%orig;
-		return;
+	return %orig;
     }
     
     CGFloat const screenWidth = UIScreen.mainScreen.bounds.size.width;
@@ -209,7 +208,7 @@ static CGFloat offset = 0;
 
 	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
 }
-%end	// %hook BSUICAPackageView
+%end	/// %hook BSUICAPackageView
 
 %hook CSCombinedListViewController
 - (UIEdgeInsets)_listViewDefaultContentInsets {
@@ -218,24 +217,26 @@ static CGFloat offset = 0;
     orig.top += offset;
     return orig;
 }
-%end	// %hook CSCombinedListViewController
+%end	/// %hook CSCombinedListViewController
 %end	// %group iOS13
 
 
 
 %ctor {
-	MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
-	if (libGestalt) {
-		void *MGCopyAnswerFn = MSFindSymbol(libGestalt, "_MGCopyAnswer");
-		const uint8_t *MGCopyAnswer_ptr = (const uint8_t *)MGCopyAnswer;
-		addr_t branch = find_branch64(MGCopyAnswer_ptr, 0, 8);
-		addr_t branch_offset = follow_branch64(MGCopyAnswer_ptr, branch);
-		MSHookFunction(((void *)((const uint8_t *)MGCopyAnswerFn + branch_offset)), (void *)new_MGCopyAnswer_internal, (void **)&orig_MGCopyAnswer_internal);
+
+	%init();
 		
-		%init();
-		
-		if (kCFCoreFoundationVersionNumber >= 1665.15) {
-			%init(iOS13);
+	if (kCFCoreFoundationVersionNumber >= 1665.15) {
+		%init(iOS13);
+	}
+	else {
+		MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
+		if (libGestalt) {
+			void *MGCopyAnswerFn = MSFindSymbol(libGestalt, "_MGCopyAnswer");
+			const uint8_t *MGCopyAnswer_ptr = (const uint8_t *)MGCopyAnswer;
+			addr_t branch = find_branch64(MGCopyAnswer_ptr, 0, 8);
+			addr_t branch_offset = follow_branch64(MGCopyAnswer_ptr, branch);
+			MSHookFunction(((void *)((const uint8_t *)MGCopyAnswerFn + branch_offset)), (void *)new_MGCopyAnswer_internal, (void **)&orig_MGCopyAnswer_internal);
 		}
 	}
 }
