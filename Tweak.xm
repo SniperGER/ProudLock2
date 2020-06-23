@@ -57,24 +57,6 @@ CFPropertyListRef new_MGCopyAnswer_internal(CFStringRef key, uint32_t* outTypeCo
 static CGFloat offset = 0;
 
 %hook SBDashBoardViewController
-- (void)loadView {
-	if (%c(JPWeatherManager) != nil) {
-		%orig;
-		return;
-	}
-	
-	CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
-	if (screenWidth <= 320) {
-		offset = 20;
-	} else if (screenWidth <= 375) {
-		offset = 35;
-	} else if (screenWidth <= 414) {
-		offset = 28;
-	}
-	
-	%orig;
-}
-
 - (void)handleBiometricEvent:(unsigned long long)arg1 {
 	%orig;
 
@@ -108,6 +90,24 @@ static CGFloat offset = 0;
 %end	// %hook SBUICAPackageView
 
 %hook SBFLockScreenDateView
+- (id)initWithFrame:(CGRect)arg1 {
+
+    if (%c(JPWeatherManager) != nil) {
+	return %orig;
+    }
+    
+    CGFloat const screenWidth = UIScreen.mainScreen.bounds.size.width;
+	if (screenWidth <= 320) {
+		offset = 20;
+	} else if (screenWidth <= 375) {
+		offset = 35;
+	} else if (screenWidth <= 414) {
+		offset = 28;
+	}
+
+    return %orig;
+
+}
 - (void)layoutSubviews {
 	%orig;
 	
@@ -208,24 +208,35 @@ static CGFloat offset = 0;
 
 	return %orig(packageName, [NSBundle bundleWithPath:@"/Library/Application Support/ProudLock2"]);
 }
-%end	// %hook BSUICAPackageView
+%end	/// %hook BSUICAPackageView
+
+%hook CSCombinedListViewController
+- (UIEdgeInsets)_listViewDefaultContentInsets {
+    UIEdgeInsets orig = %orig;
+
+    orig.top += offset;
+    return orig;
+}
+%end	/// %hook CSCombinedListViewController
 %end	// %group iOS13
 
 
 
 %ctor {
-	MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
-	if (libGestalt) {
-		void *MGCopyAnswerFn = MSFindSymbol(libGestalt, "_MGCopyAnswer");
-		const uint8_t *MGCopyAnswer_ptr = (const uint8_t *)MGCopyAnswer;
-		addr_t branch = find_branch64(MGCopyAnswer_ptr, 0, 8);
-		addr_t branch_offset = follow_branch64(MGCopyAnswer_ptr, branch);
-		MSHookFunction(((void *)((const uint8_t *)MGCopyAnswerFn + branch_offset)), (void *)new_MGCopyAnswer_internal, (void **)&orig_MGCopyAnswer_internal);
+
+	%init();
 		
-		%init();
-		
-		if (kCFCoreFoundationVersionNumber >= 1665.15) {
-			%init(iOS13);
+	if (kCFCoreFoundationVersionNumber >= 1665.15) {
+		%init(iOS13);
+	}
+	else {
+		MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
+		if (libGestalt) {
+			void *MGCopyAnswerFn = MSFindSymbol(libGestalt, "_MGCopyAnswer");
+			const uint8_t *MGCopyAnswer_ptr = (const uint8_t *)MGCopyAnswer;
+			addr_t branch = find_branch64(MGCopyAnswer_ptr, 0, 8);
+			addr_t branch_offset = follow_branch64(MGCopyAnswer_ptr, branch);
+			MSHookFunction(((void *)((const uint8_t *)MGCopyAnswerFn + branch_offset)), (void *)new_MGCopyAnswer_internal, (void **)&orig_MGCopyAnswer_internal);
 		}
 	}
 }
