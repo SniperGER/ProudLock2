@@ -228,8 +228,7 @@ static CGFloat offset = 0;
 		
 	if (kCFCoreFoundationVersionNumber >= 1665.15) {
 		%init(iOS13);
-	}
-	else {
+	} else {
 		MSImageRef libGestalt = MSGetImageByName("/usr/lib/libMobileGestalt.dylib");
 		if (libGestalt) {
 			void *MGCopyAnswerFn = MSFindSymbol(libGestalt, "_MGCopyAnswer");
